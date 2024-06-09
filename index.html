@@ -12,11 +12,16 @@
             padding: 20px;
         }
         .container {
-            max-width: 600px;
+            max-width: 1200px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        .section {
+            width: 45%;
         }
         button {
             padding: 10px 20px;
@@ -68,16 +73,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>Monster Game</h1>
-        <div id="scoreBoard">Score: 0</div>
-        <div id="highScoreBoard">High Score: 0</div>
-        <button onclick="addItem('검')">검 추가</button>
-        <button onclick="addItem('방패')">방패 추가</button>
-        <button onclick="killMonster()">몬스터 죽이기</button>
-        <h2>아이템 목록:</h2>
-        <div id="itemList"></div>
-        <h2>몬스터 목록:</h2>
-        <ul id="monsterList"></ul>
+        <div class="section">
+            <h2>아이템 목록:</h2>
+            <div id="itemList"></div>
+        </div>
+        <div class="section">
+            <div id="scoreBoard">Score: 0</div>
+            <div id="highScoreBoard">High Score: 0</div>
+            <button onclick="addItem('검')">검 추가</button>
+            <button onclick="addItem('방패')">방패 추가</button>
+            <button onclick="killMonster()">몬스터 죽이기</button>
+            <h2>몬스터 목록:</h2>
+            <ul id="monsterList"></ul>
+        </div>
     </div>
 
     <script>
