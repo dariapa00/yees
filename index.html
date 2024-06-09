@@ -3,55 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Items</title>
+    <title>Item Management</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: lightblue;
+            background-color: #f4f4f4;
+            margin: 0;
             padding: 20px;
         }
-        .item {
-            padding: 10px;
-            margin: 5px;
-            background-color: white;
-            border: 1px solid #ddd;
-            display: inline-block;
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <h1>My Game Items</h1>
-    <div id="items"></div>
-    <button onclick="addItem('itemA')">Add Sword</button>
-    <button onclick="addItem('itemB')">Add Shield</button>
+    <div class="container">
+        <h1>아이템 관리</h1>
+        <button onclick="addItem()">아이템 추가</button>
+        <button onclick="removeItem()">아이템 버리기</button>
+        <h2>아이템 목록:</h2>
+        <ul id="itemList"></ul>
+    </div>
 
     <script>
-        const items = {
-            itemA: 'Sword',
-            itemB: 'Shield'
-        };
-
-        function addItem(key) {
-            let savedItems = JSON.parse(localStorage.getItem('gameItems')) || [];
-            savedItems.push(key);
-            localStorage.setItem('gameItems', JSON.stringify(savedItems));
-            displayItems();
-        }
-
-        function displayItems() {
-            const savedItems = JSON.parse(localStorage.getItem('gameItems')) || [];
-            const itemsContainer = document.getElementById('items');
-            itemsContainer.innerHTML = '';
-            savedItems.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'item';
-                itemElement.innerText = items[item];
-                itemsContainer.appendChild(itemElement);
+        // 로컬 스토리지에서 아이템을 불러오기
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem('items')) || [];
+            const itemList = document.getElementById('itemList');
+            itemList.innerHTML = '';
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                itemList.appendChild(li);
             });
         }
 
-        // 페이지 로드 시 아이템 불러오기
-        window.onload = displayItems;
+        // 아이템 추가하기
+        function addItem() {
+            const items = JSON.parse(localStorage.getItem('items')) || [];
+            const newItem = `아이템 ${items.length + 1}`;
+            items.push(newItem);
+            localStorage.setItem('items', JSON.stringify(items));
+            loadItems();
+        }
+
+        // 아이템 버리기
+        function removeItem() {
+            const items = JSON.parse(localStorage.getItem('items')) || [];
+            items.pop(); // 맨 뒤의 아이템 삭제
+            localStorage.setItem('items', JSON.stringify(items));
+            loadItems();
+        }
+
+        // 페이지 로드 시 아이템 목록 불러오기
+        window.onload = loadItems;
     </script>
 </body>
 </html>
