@@ -32,11 +32,16 @@
             padding: 10px;
             background-color: #e0e0e0;
         }
+        #scoreBoard {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Monster Game</h1>
+        <div id="scoreBoard">Score: 0</div>
         <button onclick="addItem('검')">검 추가</button>
         <button onclick="addItem('방패')">방패 추가</button>
         <button onclick="addMonster()">몬스터 추가</button>
@@ -48,6 +53,8 @@
     </div>
 
     <script>
+        let bossHealth = 5; // 보스 몬스터의 초기 체력
+
         function loadItems() {
             const items = JSON.parse(localStorage.getItem('items')) || [];
             const itemList = document.getElementById('itemList');
@@ -66,8 +73,16 @@
             monsters.forEach((monster, index) => {
                 const li = document.createElement('li');
                 li.textContent = `Monster ${index + 1}`;
+                if (monster === 'boss') {
+                    li.textContent += ' (Boss)';
+                }
                 monsterList.appendChild(li);
             });
+        }
+
+        function loadScore() {
+            const score = parseInt(localStorage.getItem('score')) || 0;
+            document.getElementById('scoreBoard').innerText = `Score: ${score}`;
         }
 
         function addItem(item) {
@@ -79,7 +94,14 @@
 
         function addMonster() {
             const monsters = JSON.parse(localStorage.getItem('monsters')) || [];
-            monsters.push('monster');
+            const score = parseInt(localStorage.getItem('score')) || 0;
+
+            if (score % 10 === 0 && score !== 0) {
+                monsters.push('boss'); // 10점 단위로 보스 추가
+            } else {
+                monsters.push('monster');
+            }
+
             localStorage.setItem('monsters', JSON.stringify(monsters));
             loadMonsters();
         }
@@ -87,25 +109,39 @@
         function killMonster() {
             const items = JSON.parse(localStorage.getItem('items')) || [];
             const monsters = JSON.parse(localStorage.getItem('monsters')) || [];
+            let score = parseInt(localStorage.getItem('score')) || 0;
 
             const hasSword = items.includes('검');
             const hasShield = items.includes('방패');
 
             if (monsters.length > 0 && hasSword && hasShield) {
-                // Remove one monster
-                monsters.pop();
+                const lastMonster = monsters[monsters.length - 1];
 
-                // Randomly remove either a sword or a shield
+                if (lastMonster === 'boss') {
+                    bossHealth--;
+                    if (bossHealth === 0) {
+                        monsters.pop();
+                        bossHealth = 5; // 보스 몬스터 초기 체력 재설정
+                        score++;
+                    }
+                } else {
+                    monsters.pop();
+                    score++;
+                }
+
+                // 랜덤으로 검 또는 방패 제거
                 const randomIndex = Math.random() < 0.5 ? items.indexOf('검') : items.indexOf('방패');
                 if (randomIndex !== -1) {
                     items.splice(randomIndex, 1);
                 }
 
-                // Save changes to local storage
+                // 로컬 스토리지에 업데이트
                 localStorage.setItem('items', JSON.stringify(items));
                 localStorage.setItem('monsters', JSON.stringify(monsters));
+                localStorage.setItem('score', score);
                 loadItems();
                 loadMonsters();
+                loadScore();
             } else {
                 alert('검과 방패가 모두 있어야 몬스터를 죽일 수 있습니다.');
             }
@@ -114,8 +150,10 @@
         window.onload = () => {
             loadItems();
             loadMonsters();
+            loadScore();
         };
     </script>
 </body>
 </html>
+
 
