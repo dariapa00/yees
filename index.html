@@ -43,6 +43,27 @@
             margin-bottom: 20px;
             color: green;
         }
+        .boss-health-bar {
+            height: 20px;
+            background-color: red;
+            width: 100%;
+            margin-top: 5px;
+        }
+        .boss-health {
+            height: 20px;
+            background-color: green;
+            width: 100%;
+        }
+        .item {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            display: inline-block;
+            background-color: lightgrey;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -54,7 +75,7 @@
         <button onclick="addItem('방패')">방패 추가</button>
         <button onclick="killMonster()">몬스터 죽이기</button>
         <h2>아이템 목록:</h2>
-        <ul id="itemList"></ul>
+        <div id="itemList"></div>
         <h2>몬스터 목록:</h2>
         <ul id="monsterList"></ul>
     </div>
@@ -68,9 +89,12 @@
             const itemList = document.getElementById('itemList');
             itemList.innerHTML = '';
             for (let item in items) {
-                const li = document.createElement('li');
-                li.textContent = `${item} x${items[item]}`;
-                itemList.appendChild(li);
+                for (let i = 0; i < items[item]; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.textContent = item;
+                    itemList.appendChild(div);
+                }
             }
         }
 
@@ -83,6 +107,13 @@
                 li.textContent = `Monster ${index + 1}`;
                 if (monster === 'boss') {
                     li.textContent += ' (Boss)';
+                    const healthBar = document.createElement('div');
+                    healthBar.className = 'boss-health-bar';
+                    const health = document.createElement('div');
+                    health.className = 'boss-health';
+                    health.style.width = `${(bossHealth / 5) * 100}%`; // 보스 체력바 표시
+                    healthBar.appendChild(health);
+                    li.appendChild(healthBar);
                 }
                 monsterList.appendChild(li);
             });
@@ -186,9 +217,11 @@
             // 게임 초기화
             localStorage.setItem('score', 0);
             localStorage.setItem('monsters', JSON.stringify([]));
+            localStorage.setItem('items', JSON.stringify({}));
             warningGiven = false;
             loadScore();
             loadMonsters();
+            loadItems();
             loadHighScore();
         }
 
@@ -202,6 +235,7 @@
     </script>
 </body>
 </html>
+
 
 
 
