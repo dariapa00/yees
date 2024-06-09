@@ -91,6 +91,8 @@
     <script>
         let bossHealth = 5; // 보스 몬스터의 초기 체력
         let warningGiven = false; // 경고 메시지가 이미 표시되었는지 여부
+        let interval = 2000; // 초기 몬스터 생성 간격 (밀리초)
+        let monsterInterval; // 몬스터 생성 인터벌
 
         function loadItems() {
             const items = JSON.parse(localStorage.getItem('items')) || {};
@@ -139,6 +141,7 @@
         function loadScore() {
             const score = parseInt(localStorage.getItem('score')) || 0;
             document.getElementById('scoreBoard').innerText = `Score: ${score}`;
+            adjustMonsterInterval(score);
         }
 
         function loadHighScore() {
@@ -212,6 +215,14 @@
             }
         }
 
+        function adjustMonsterInterval(score) {
+            if (score % 50 === 0 && score !== 0) {
+                clearInterval(monsterInterval);
+                interval = interval / 1.5; // 간격을 1.5배 줄임
+                monsterInterval = setInterval(addMonster, interval);
+            }
+        }
+
         function gameOver() {
             const score = parseInt(localStorage.getItem('score')) || 0;
             const highScore = parseInt(localStorage.getItem('highScore')) || 0;
@@ -226,6 +237,9 @@
             localStorage.setItem('score', 0);
             localStorage.setItem('monsters', JSON.stringify([]));
             localStorage.setItem('items', JSON.stringify({}));
+            interval = 2000; // 초기 몬스터 생성 간격으로 재설정
+            clearInterval(monsterInterval);
+            monsterInterval = setInterval(addMonster, interval);
             warningGiven = false;
             loadScore();
             loadMonsters();
@@ -238,7 +252,7 @@
             loadMonsters();
             loadScore();
             loadHighScore();
-            setInterval(addMonster, 2000); // 2초마다 몬스터 추가
+            monsterInterval = setInterval(addMonster, interval); // 초기 몬스터 생성 간격 설정
         };
     </script>
 </body>
