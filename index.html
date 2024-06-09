@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: lightblue;
+            padding: 20px;
+        }
+        .item {
+            padding: 10px;
+            margin: 5px;
+            background-color: white;
+            border: 1px solid #ddd;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Game Items</h1>
+    <div id="items"></div>
+    <button onclick="addItem('itemA')">Add Sword</button>
+    <button onclick="addItem('itemB')">Add Shield</button>
+
+    <script>
+        const items = {
+            itemA: 'Sword',
+            itemB: 'Shield'
+        };
+
+        function addItem(key) {
+            let savedItems = JSON.parse(localStorage.getItem('gameItems')) || [];
+            savedItems.push(key);
+            localStorage.setItem('gameItems', JSON.stringify(savedItems));
+            displayItems();
+        }
+
+        function displayItems() {
+            const savedItems = JSON.parse(localStorage.getItem('gameItems')) || [];
+            const itemsContainer = document.getElementById('items');
+            itemsContainer.innerHTML = '';
+            savedItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'item';
+                itemElement.innerText = items[item];
+                itemsContainer.appendChild(itemElement);
+            });
+        }
+
+        // 페이지 로드 시 아이템 불러오기
+        window.onload = displayItems;
+    </script>
+</body>
+</html>
