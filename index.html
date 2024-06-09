@@ -216,11 +216,13 @@
         }
 
         function adjustMonsterInterval(score) {
-            if (score % 50 === 0 && score !== 0) {
-                clearInterval(monsterInterval);
+            clearInterval(monsterInterval);
+            if (score >= 100) {
+                interval = 300; // 100점 이상일 경우 0.3초 간격으로 설정
+            } else if (score % 50 === 0 && score !== 0) {
                 interval = interval / 1.5; // 간격을 1.5배 줄임
-                monsterInterval = setInterval(addMonster, interval);
             }
+            monsterInterval = setInterval(addMonster, interval);
         }
 
         function gameOver() {
