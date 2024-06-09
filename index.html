@@ -20,7 +20,7 @@
         }
         button {
             padding: 10px 20px;
-            margin: 10px 0;
+            margin: 10px 5px;
             font-size: 16px;
         }
         #itemList, #monsterList {
@@ -31,10 +31,17 @@
             margin: 5px 0;
             padding: 10px;
             background-color: #e0e0e0;
+            display: inline-block;
+            margin-right: 10px;
         }
         #scoreBoard {
             font-size: 24px;
             margin-bottom: 20px;
+        }
+        #highScoreBoard {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: green;
         }
     </style>
 </head>
@@ -42,9 +49,9 @@
     <div class="container">
         <h1>Monster Game</h1>
         <div id="scoreBoard">Score: 0</div>
+        <div id="highScoreBoard">High Score: 0</div>
         <button onclick="addItem('검')">검 추가</button>
         <button onclick="addItem('방패')">방패 추가</button>
-        <button onclick="addMonster()">몬스터 추가</button>
         <button onclick="killMonster()">몬스터 죽이기</button>
         <h2>아이템 목록:</h2>
         <ul id="itemList"></ul>
@@ -54,16 +61,17 @@
 
     <script>
         let bossHealth = 5; // 보스 몬스터의 초기 체력
+        let warningGiven = false; // 경고 메시지가 이미 표시되었는지 여부
 
         function loadItems() {
-            const items = JSON.parse(localStorage.getItem('items')) || [];
+            const items = JSON.parse(localStorage.getItem('items')) || {};
             const itemList = document.getElementById('itemList');
             itemList.innerHTML = '';
-            items.forEach((item) => {
+            for (let item in items) {
                 const li = document.createElement('li');
-                li.textContent = item;
+                li.textContent = `${item} x${items[item]}`;
                 itemList.appendChild(li);
-            });
+            }
         }
 
         function loadMonsters() {
@@ -78,6 +86,15 @@
                 }
                 monsterList.appendChild(li);
             });
+
+            if (monsters.length >= 20 && !warningGiven) {
+                alert('몬스터가 너무 많습니다! 조심하세요!');
+                warningGiven = true;
+            }
+
+            if (monsters.length >= 30) {
+                gameOver();
+            }
         }
 
         function loadScore() {
@@ -85,9 +102,18 @@
             document.getElementById('scoreBoard').innerText = `Score: ${score}`;
         }
 
+        function loadHighScore() {
+            const highScore = parseInt(localStorage.getItem('highScore')) || 0;
+            document.getElementById('highScoreBoard').innerText = `High Score: ${highScore}`;
+        }
+
         function addItem(item) {
-            const items = JSON.parse(localStorage.getItem('items')) || [];
-            items.push(item);
+            const items = JSON.parse(localStorage.getItem('items')) || {};
+            if (items[item]) {
+                items[item]++;
+            } else {
+                items[item] = 1;
+            }
             localStorage.setItem('items', JSON.stringify(items));
             loadItems();
         }
@@ -107,12 +133,12 @@
         }
 
         function killMonster() {
-            const items = JSON.parse(localStorage.getItem('items')) || [];
+            const items = JSON.parse(localStorage.getItem('items')) || {};
             const monsters = JSON.parse(localStorage.getItem('monsters')) || [];
             let score = parseInt(localStorage.getItem('score')) || 0;
 
-            const hasSword = items.includes('검');
-            const hasShield = items.includes('방패');
+            const hasSword = items['검'] && items['검'] > 0;
+            const hasShield = items['방패'] && items['방패'] > 0;
 
             if (monsters.length > 0 && hasSword && hasShield) {
                 const lastMonster = monsters[monsters.length - 1];
@@ -130,9 +156,9 @@
                 }
 
                 // 랜덤으로 검 또는 방패 제거
-                const randomIndex = Math.random() < 0.5 ? items.indexOf('검') : items.indexOf('방패');
-                if (randomIndex !== -1) {
-                    items.splice(randomIndex, 1);
+                const randomItem = Math.random() < 0.5 ? '검' : '방패';
+                if (items[randomItem] && items[randomItem] > 0) {
+                    items[randomItem]--;
                 }
 
                 // 로컬 스토리지에 업데이트
@@ -147,13 +173,35 @@
             }
         }
 
+        function gameOver() {
+            const score = parseInt(localStorage.getItem('score')) || 0;
+            const highScore = parseInt(localStorage.getItem('highScore')) || 0;
+
+            if (score > highScore) {
+                localStorage.setItem('highScore', score);
+            }
+
+            alert('게임 오버! 최종 점수: ' + score);
+
+            // 게임 초기화
+            localStorage.setItem('score', 0);
+            localStorage.setItem('monsters', JSON.stringify([]));
+            warningGiven = false;
+            loadScore();
+            loadMonsters();
+            loadHighScore();
+        }
+
         window.onload = () => {
             loadItems();
             loadMonsters();
             loadScore();
+            loadHighScore();
+            setInterval(addMonster, 2000); // 2초마다 몬스터 추가
         };
     </script>
 </body>
 </html>
+
 
 
